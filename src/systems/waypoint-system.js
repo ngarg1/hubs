@@ -1,6 +1,8 @@
-import { setMatrixWorld, affixToWorldUp } from "../utils/three-utils";
+import { squareDistanceBetween, setMatrixWorld, affixToWorldUp } from "../utils/three-utils";
 import { isTagged } from "../components/tags";
 import { applyPersistentSync } from "../utils/permissions-utils";
+const SHOW_NEARBY_WAYPOINTS_SQUARE_DISTANCE = 15 ** 2;
+const v = new THREE.Vector3();
 const calculateIconTransform = (function() {
   const up = new THREE.Vector3();
   const backward = new THREE.Vector3();
@@ -25,7 +27,7 @@ const calculateIconTransform = (function() {
       scale = 0.00001;
       camToWaypoint.set(0, 0, -1);
     } else {
-      scale = 0.1 + 0.05 * distance;
+      scale = 0.15 + 0.03 * distance;
     }
     forward
       .copy(camToWaypoint)
@@ -352,14 +354,16 @@ export class WaypointSystem {
         elementFromTemplate.classList.contains("teleport-waypoint-icon") ||
         elementFromTemplate.classList.contains("occupiable-waypoint-icon")
       ) {
-        elementFromTemplate.object3D.visible = this.scene.is("frozen");
-        if (elementFromTemplate.object3D.visible) {
-          this.viewingCamera = this.viewingCamera || document.getElementById("viewing-camera").object3D;
-          setMatrixWorld(
-            elementFromTemplate.object3D,
-            calculateIconTransform(waypointComponent.el.object3D, this.viewingCamera, this.helperMat4)
-          );
-        }
+        this.viewingCamera = this.viewingCamera || document.getElementById("viewing-camera").object3D;
+        setMatrixWorld(
+          elementFromTemplate.object3D,
+          calculateIconTransform(waypointComponent.el.object3D, this.viewingCamera, this.helperMat4)
+        );
+        this.viewingCamera.updateMatrices();
+        elementFromTemplate.object3D.visible =
+          squareDistanceBetween(elementFromTemplate.object3D, this.viewingCamera) <
+            SHOW_NEARBY_WAYPOINTS_SQUARE_DISTANCE *
+              v.setFromMatrixColumn(this.viewingCamera.matrixWorld, 2).lengthSq() || this.scene.is("frozen");
       }
     };
     function tickWaypoint(waypointComponent) {
