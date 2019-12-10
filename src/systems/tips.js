@@ -134,10 +134,11 @@ const VALIDATORS = {
     );
     return cameraDelta ? FINISH : VALID;
   },
-  locomotion: function(userinput) {
+  locomotion: function(userinput, scene) {
     if (
       userinput.activeSets.includes(sets.rightCursorHoldingPen) ||
-      userinput.activeSets.includes(sets.leftCursorHoldingPen)
+      userinput.activeSets.includes(sets.leftCursorHoldingPen) ||
+      scene.systems["hubs-systems"].characterController.isMotionDisabled
     )
       return INVALID;
     const accel = userinput.get(paths.actions.characterAcceleration);
