@@ -4,7 +4,8 @@ import {
   getDefaultResolveQuality,
   injectCustomShaderChunks,
   addMeshScaleAnimation,
-  closeExistingMediaMirror
+  closeExistingMediaMirror,
+  cloneMedia
 } from "../utils/media-utils";
 import {
   isNonCorsProxyDomain,
@@ -301,13 +302,42 @@ AFRAME.registerComponent("media-loader", {
     const versionChanged = !!(oldData.version && oldData.version !== version);
 
     if (versionChanged) {
+      if (this.data.linkedEl) {
+        return;
+      }
+      const mirrorTarget = document.querySelector("#media-mirror-target");
+      if (
+        mirrorTarget.firstChild &&
+        mirrorTarget.firstChild.components["media-loader"] &&
+        mirrorTarget.firstChild.components["media-loader"].data.linkedEl === this.el
+      ) {
+        await closeExistingMediaMirror();
+        this.el.addEventListener(
+          "media-loaded",
+          () => {
+            const { entity } = cloneMedia(this.el, "#linked-media", src, false, true, mirrorTarget);
+
+            entity.object3D.scale.set(0.75, 0.75, 0.75);
+            entity.object3D.matrixNeedsUpdate = true;
+
+            const refreshButton = entity.querySelector("[refresh-media-button]");
+            if (refreshButton) {
+              refreshButton.parentNode.removeChild(refreshButton);
+            }
+
+            mirrorTarget.parentEl.components["follow-in-fov"].reset();
+            mirrorTarget.parentEl.object3D.visible = true;
+          },
+          { once: true }
+        );
+      }
       this.el.emit("media_refreshing");
 
       // Don't animate if its a refresh.
       this.data.animate = false;
 
       // Play the sound effect on a refresh only if we are the owner
-      this.data.playSoundEffect = NAF.utils.isMine(this.networkedEl);
+      this.data.playSoundEffect = this.networkedEl && NAF.utils.isMine(this.networkedEl);
     }
 
     try {

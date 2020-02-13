@@ -734,6 +734,9 @@
 
             <template id="video-hover-menu">
                 <a-entity class="ui interactable-ui hover-container" visible="false">
+                    <a-entity mixin="rounded-text-button ui" is-remote-hover-target tags="singleActionButton: true; isHoverMenuChild: true;" refresh-media-button scale="0.5 0.5 0.5" position="0 0 0.001">
+                        <a-entity text="value:refresh; width:1.5; align:center;" text-raycast-hack position="0 0 0.02"></a-entity>
+                    </a-entity>
                     <a-entity
                         is-remote-hover-target
                         tags="singleActionButton: true; isHoverMenuChild: true;"

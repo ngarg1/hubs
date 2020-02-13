@@ -55,11 +55,16 @@ AFRAME.registerComponent("open-media-button", {
       }
     };
 
-    NAF.utils.getNetworkedEntity(this.el).then(networkedEl => {
-      this.targetEl = networkedEl;
-      this.targetEl.addEventListener("media_resolved", this.updateSrc, { once: true });
-      this.updateSrc();
-    });
+    NAF.utils
+      .getNetworkedEntity(this.el)
+      .then(networkedEl => {
+        this.targetEl = networkedEl;
+        this.targetEl.addEventListener("media_resolved", this.updateSrc, { once: true });
+        this.updateSrc();
+      })
+      .catch(() => {
+        this.el.parentNode.removeChild(this.el);
+      });
   },
 
   play() {

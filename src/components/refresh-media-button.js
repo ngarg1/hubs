@@ -26,18 +26,23 @@ AFRAME.registerComponent("refresh-media-button", {
       }
     };
 
-    NAF.utils.getNetworkedEntity(this.el).then(networkedEl => {
-      this.targetEl = networkedEl;
+    NAF.utils
+      .getNetworkedEntity(this.el)
+      .then(networkedEl => {
+        this.targetEl = networkedEl;
 
-      window.APP.hubChannel.addEventListener("permissions_updated", this.updateVisibility);
+        window.APP.hubChannel.addEventListener("permissions_updated", this.updateVisibility);
 
-      if (this.targetEl) {
-        this.targetEl.addEventListener("pinned", this.updateVisibility);
-        this.targetEl.addEventListener("unpinned", this.updateVisibility);
-      }
+        if (this.targetEl) {
+          this.targetEl.addEventListener("pinned", this.updateVisibility);
+          this.targetEl.addEventListener("unpinned", this.updateVisibility);
+        }
 
-      this.updateVisibility();
-    });
+        this.updateVisibility();
+      })
+      .catch(() => {
+        this.el.parentNode.removeChild(this.el);
+      });
   },
 
   updateVisibility() {
