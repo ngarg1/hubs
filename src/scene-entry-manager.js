@@ -272,7 +272,7 @@ export default class SceneEntryManager {
   };
 
   _setupMedia = mediaStream => {
-    const offset = { x: 0, y: 0, z: -1.5 };
+    const offset = { x: 0, y: 0, z: 0 };
     const spawnMediaInfrontOfPlayer = (src, contentOrigin) => {
       if (!this.hubChannel.can("spawn_and_move_media")) return;
       const { entity, orientation } = addMedia(
@@ -286,7 +286,7 @@ export default class SceneEntryManager {
       orientation.then(or => {
         entity.setAttribute("offset-relative-to", {
           target: "#avatar-pov-node",
-          offset,
+          offset: offset,
           orientation: or
         });
       });
@@ -303,12 +303,16 @@ export default class SceneEntryManager {
         contentOrigin,
         null,
         !(src instanceof MediaStream),
-        true
+        true,
+        true,
+        {},
+        true,
+        document.getElementById("avatar-pov-node")
       );
-      const headSpawnOffset = { x: 0, y: 1, z: 0 };
+      const headSpawnOffset = { x: 0, y: -10, z: 0 };
       orientation.then(or => {
         entity.setAttribute("offset-relative-to", {
-          target: "#avatar-rig",
+          target: "#avatar-pov-node",
           headSpawnOffset,
           orientation: or
         });
