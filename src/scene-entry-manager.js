@@ -297,15 +297,20 @@ export default class SceneEntryManager {
     const spawnMediaOnPlayerHead = (src, contentOrigin) => {
       // TODO: Code this
       if (!this.hubChannel.can("spawn_and_move_media")) return;
+      const parentEl = document.getElementById("avatar-rig");
       const { entity, orientation } = addMedia(
         src,
         "#static-media",
         contentOrigin,
         null,
         !(src instanceof MediaStream),
-        true
+        true,
+        true,
+        {},
+        true,
+        parentEl
       );
-      const headSpawnOffset = { x: 0, y: 1, z: 0 };
+      const headSpawnOffset = { x: 0, y: 0.5, z: 0 };
       orientation.then(or => {
         entity.setAttribute("offset-relative-to", {
           target: "#avatar-rig",
