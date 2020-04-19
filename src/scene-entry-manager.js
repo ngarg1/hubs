@@ -297,6 +297,7 @@ export default class SceneEntryManager {
     const spawnMediaOnPlayerHead = (src, contentOrigin) => {
       // TODO: Code this
       if (!this.hubChannel.can("spawn_and_move_media")) return;
+      const avatarPovNode = document.getElementById("avatar-pov-node");
       const { entity, orientation } = addMedia(
         src,
         "#static-media",
@@ -307,16 +308,21 @@ export default class SceneEntryManager {
         true,
         {},
         true,
-        document.getElementById("avatar-pov-node")
+        avatarPovNode
       );
-      const headSpawnOffset = { x: 0, y: -10, z: 0 };
+
+      const headSpawnOffset = { x: 0, y: 0, z: -1 };
+      console.log("Algo!2!");
+
       orientation.then(or => {
+        console.log("The Orientation is " + or);
         entity.setAttribute("offset-relative-to", {
           target: "#avatar-pov-node",
-          headSpawnOffset,
+          offset: headSpawnOffset,
           orientation: or
         });
       });
+      entity.object3D.setRotationFromQuaternion(avatarPovNode.object3D.quaternion);
 
       return entity;
     };
