@@ -310,6 +310,7 @@ export default class SceneEntryManager {
         true,
         avatarPovNode
       );
+      entity.object3D.scale.set(0.4, 0.4, 0.4); // Set Video Head Scae to Custom Initial Value
 
       const headSpawnOffset = { x: 0, y: 0, z: -0.025 };
       orientation.then(or => {
