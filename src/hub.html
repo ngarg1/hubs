@@ -216,6 +216,16 @@
                 </a-entity>
             </template>
 
+            <template id="video-head">
+                <a-entity
+                        matrix-auto-update
+                        body-helper="type: static; mass: 1; collisionFilterGroup: 1; collisionFilterMask: 11;"
+                        listed-media
+                        set-yxz-order
+                >
+                </a-entity>
+            </template>
+
             <template id="static-controlled-media">
                 <a-entity
                     class="interactable"
