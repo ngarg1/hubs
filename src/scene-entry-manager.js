@@ -297,7 +297,7 @@ export default class SceneEntryManager {
     const spawnMediaOnPlayerHead = (src, contentOrigin) => {
       // TODO: Code this
       if (!this.hubChannel.can("spawn_and_move_media")) return;
-      const avatarPovNode = document.getElementById("avatar-pov-node");
+      const parentEl = document.getElementById("avatar-rig");
       const { entity, orientation } = addMedia(
         src,
         "#static-media",
@@ -308,7 +308,7 @@ export default class SceneEntryManager {
         true,
         {},
         true,
-        avatarPovNode
+        parentEl
       );
       entity.object3D.scale.set(0.4, 0.4, 0.4); // Set Video Head Scae to Custom Initial Value
 
