@@ -300,7 +300,7 @@ export default class SceneEntryManager {
       const avatarPovNode = document.getElementById("avatar-pov-node");
       const { entity, orientation } = addMedia(
         src,
-        "#static-media",
+        "#video-head",
         contentOrigin,
         null,
         !(src instanceof MediaStream),
