@@ -35,6 +35,7 @@ export default class SceneEntryManager {
     this.rightCursorController = document.getElementById("right-cursor-controller");
     this.leftCursorController = document.getElementById("left-cursor-controller");
     this.avatarRig = document.getElementById("avatar-rig");
+    this.avatarPovNode = document.getElementById("avatar-pov-node");
     this._entered = false;
     this.performConditionalSignIn = () => {};
     this.history = history;
@@ -564,6 +565,9 @@ export default class SceneEntryManager {
   _spawnAvatar = () => {
     this.avatarRig.setAttribute("networked", "template: #remote-avatar; attachTemplateToLocal: false;");
     this.avatarRig.setAttribute("networked-avatar", "");
+
+    this.avatarPovNode.setAttribute("networked", "template: #remote-avatar; attachTemplateToLocal: false;");
+
     this.avatarRig.emit("entered");
   };
 
