@@ -297,7 +297,7 @@ export default class SceneEntryManager {
     const spawnMediaOnPlayerHead = (src, contentOrigin) => {
       // TODO: Code this
       if (!this.hubChannel.can("spawn_and_move_media")) return;
-      const parentEl = document.getElementById("avatar-rig");
+      const parentEl = document.getElementById("avatar-pov-node");
       const { entity, orientation } = addMedia(
         src,
         "#static-media",
