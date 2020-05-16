@@ -169,12 +169,36 @@ function registerNetworkSchemas() {
       {
         component: "media-video",
         property: "time"
+      },
+      {
+        component: "position",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      {
+        component: "rotation",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.5)
+      },
+      {
+        component: "scale",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
       }
     ],
     nonAuthorizedComponents: [
       {
         component: "media-video",
         property: "time"
+      },
+      {
+        component: "position",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      {
+        component: "rotation",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.5)
+      },
+      {
+        component: "scale",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
       }
     ]
   });
@@ -261,7 +285,7 @@ function registerNetworkSchemas() {
       {
         component: "scale",
         requiresNetworkUpdate: vectorRequiresUpdate(0.001)
-      },
+      }
     ]
   });
 

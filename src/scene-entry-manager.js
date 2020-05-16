@@ -300,7 +300,7 @@ export default class SceneEntryManager {
       const parentEl = document.getElementById("avatar-rig");
       const { entity, orientation } = addMedia(
         src,
-        "#video-head",
+        "#static-media",
         contentOrigin,
         null,
         !(src instanceof MediaStream),
