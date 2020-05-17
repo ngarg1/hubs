@@ -298,7 +298,8 @@ export default class SceneEntryManager {
     const spawnMediaOnPlayerHead = (src, contentOrigin) => {
       // TODO: Code this
       if (!this.hubChannel.can("spawn_and_move_media")) return;
-      const parentEl = document.getElementById("avatar-rig");
+      const parentEl = document.getElementById("avatar-rig").querySelector(".camera");
+      parentEl.setAttribute("networked", { template: "#static-media" });
       const { entity, orientation } = addMedia(
         src,
         "#static-media",
@@ -565,9 +566,6 @@ export default class SceneEntryManager {
   _spawnAvatar = () => {
     this.avatarRig.setAttribute("networked", "template: #remote-avatar; attachTemplateToLocal: false;");
     this.avatarRig.setAttribute("networked-avatar", "");
-
-    this.avatarPovNode.setAttribute("networked", "template: #remote-avatar; attachTemplateToLocal: false;");
-
     this.avatarRig.emit("entered");
   };
 
