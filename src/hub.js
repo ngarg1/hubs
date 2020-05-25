@@ -21,7 +21,6 @@ import "naf-janus-adapter";
 import "aframe-rounded";
 import "webrtc-adapter";
 import "aframe-slice9-component";
-import "./utils/audio-context-fix";
 import "./utils/threejs-positional-audio-updatematrixworld";
 import "./utils/threejs-world-update";
 import patchThreeAllocations from "./utils/threejs-allocation-patches";
@@ -75,7 +74,7 @@ import "./components/media-views";
 import "./components/avatar-volume-controls";
 import "./components/pinch-to-move";
 import "./components/pitch-yaw-rotator";
-import "./components/position-at-box-shape-border";
+import "./components/position-at-border";
 import "./components/pinnable";
 import "./components/pin-networked-object-button";
 import "./components/mirror-media-button";
@@ -213,7 +212,7 @@ import registerNetworkSchemas from "./network-schemas";
 import registerTelemetry from "./telemetry";
 import { warmSerializeElement } from "./utils/serialize-element";
 
-import { getAvailableVREntryTypes, VR_DEVICE_AVAILABILITY } from "./utils/vr-caps-detect";
+import { getAvailableVREntryTypes, VR_DEVICE_AVAILABILITY, ONLY_SCREEN_AVAILABLE } from "./utils/vr-caps-detect";
 import detectConcurrentLoad from "./utils/concurrent-load-detector";
 
 import qsTruthy from "./utils/qs_truthy";
@@ -314,6 +313,44 @@ function mountUI(props = {}) {
 function remountUI(props) {
   uiProps = { ...uiProps, ...props };
   mountUI(uiProps);
+}
+
+function setupPeerConnectionConfig(adapter, host, turn) {
+  const forceTurn = qs.get("force_turn");
+  const forceTcp = qs.get("force_tcp");
+  const peerConnectionConfig = {};
+
+  if (turn && turn.enabled) {
+    const iceServers = [];
+
+    turn.transports.forEach(ts => {
+      // Try both TURN DTLS and TCP/TLS
+      if (!forceTcp) {
+        iceServers.push({ urls: `turns:${host}:${ts.port}`, username: turn.username, credential: turn.credential });
+      }
+
+      iceServers.push({
+        urls: `turns:${host}:${ts.port}?transport=tcp`,
+        username: turn.username,
+        credential: turn.credential
+      });
+    });
+
+    iceServers.push({ urls: "stun:stun1.l.google.com:19302" });
+
+    peerConnectionConfig.iceServers = iceServers;
+
+    if (forceTurn || forceTcp) {
+      peerConnectionConfig.iceTransportPolicy = "relay";
+    }
+  } else {
+    peerConnectionConfig.iceServers = [
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:19302" }
+    ];
+  }
+
+  adapter.setPeerConnectionConfig(peerConnectionConfig);
 }
 
 async function updateEnvironmentForHub(hub, entryManager) {
@@ -524,8 +561,10 @@ function handleHubChannelJoined(entryManager, hubChannel, messageDispatch, data)
 
           newHostPollInterval = setInterval(async () => {
             const currentServerURL = NAF.connection.adapter.serverUrl;
-            const newHubHost = await hubChannel.getHost();
-            const newServerURL = `wss://${newHubHost}`;
+            const { host, port, turn } = await hubChannel.getHost();
+            const newServerURL = `wss://${host}:${port}`;
+
+            setupPeerConnectionConfig(adapter, host, turn);
 
             if (currentServerURL !== newServerURL) {
               console.log("Connecting to new Janus server " + newServerURL);
@@ -718,6 +757,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const scene = document.querySelector("a-scene");
   scene.setAttribute("shadow", { enabled: window.APP.quality !== "low" }); // Disable shadows on low quality
+  scene.renderer.debug.checkShaderErrors = false;
 
   // HACK - Trigger initial batch preparation with an invisible object
   scene
@@ -744,8 +784,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const authChannel = new AuthChannel(store);
   const hubChannel = new HubChannel(store, hubId);
-  const availableVREntryTypes = await getAvailableVREntryTypes();
-  const entryManager = new SceneEntryManager(hubChannel, authChannel, availableVREntryTypes, history);
+  const entryManager = new SceneEntryManager(hubChannel, authChannel, history);
   const performConditionalSignIn = async (predicate, action, messageId, onFailure) => {
     if (predicate()) return action();
 
@@ -843,7 +882,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   });
 
-  remountUI({ performConditionalSignIn, embed: isEmbed, showPreload: isEmbed });
+  remountUI({
+    performConditionalSignIn,
+    embed: isEmbed,
+    showPreload: isEmbed
+  });
   entryManager.performConditionalSignIn = performConditionalSignIn;
   entryManager.init();
 
@@ -866,6 +909,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return false;
   };
 
+  remountUI({ availableVREntryTypes: ONLY_SCREEN_AVAILABLE, checkingForDeviceAvailability: true });
+  const availableVREntryTypesPromise = getAvailableVREntryTypes();
   scene.addEventListener("enter-vr", () => {
     if (handleEarlyVRMode()) return true;
 
@@ -876,10 +921,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.body.classList.add("vr-mode");
 
-    // Don't stretch canvas on cardboard, since that's drawing the actual VR view :)
-    if ((!isMobile && !isMobileVR) || availableVREntryTypes.cardboard !== VR_DEVICE_AVAILABILITY.yes) {
-      document.body.classList.add("vr-mode-stretch");
-    }
+    availableVREntryTypesPromise.then(availableVREntryTypes => {
+      // Don't stretch canvas on cardboard, since that's drawing the actual VR view :)
+      if ((!isMobile && !isMobileVR) || availableVREntryTypes.cardboard !== VR_DEVICE_AVAILABILITY.yes) {
+        document.body.classList.add("vr-mode-stretch");
+      }
+    });
   });
 
   handleEarlyVRMode();
@@ -1011,25 +1058,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  if (isMobileVR) {
-    remountUI({ availableVREntryTypes, forcedVREntryType: "vr" });
+  availableVREntryTypesPromise.then(async availableVREntryTypes => {
+    if (isMobileVR) {
+      remountUI({ availableVREntryTypes, forcedVREntryType: "vr", checkingForDeviceAvailability: false });
 
-    if (/Oculus/.test(navigator.userAgent)) {
-      // HACK - The polyfill reports Cardboard as the primary VR display on startup out ahead of
-      // Oculus Go on Oculus Browser 5.5.0 beta. This display is cached by A-Frame,
-      // so we need to resolve that and get the real VRDisplay before entering as well.
-      const displays = await navigator.getVRDisplays();
-      const vrDisplay = displays.length && displays[0];
-      AFRAME.utils.device.getVRDisplay = () => vrDisplay;
+      if (/Oculus/.test(navigator.userAgent)) {
+        // HACK - The polyfill reports Cardboard as the primary VR display on startup out ahead of
+        // Oculus Go on Oculus Browser 5.5.0 beta. This display is cached by A-Frame,
+        // so we need to resolve that and get the real VRDisplay before entering as well.
+        const displays = await navigator.getVRDisplays();
+        const vrDisplay = displays.length && displays[0];
+        AFRAME.utils.device.getVRDisplay = () => vrDisplay;
+      }
+    } else {
+      const hasVREntryDevice =
+        availableVREntryTypes.cardboard !== VR_DEVICE_AVAILABILITY.no ||
+        availableVREntryTypes.generic !== VR_DEVICE_AVAILABILITY.no ||
+        availableVREntryTypes.daydream !== VR_DEVICE_AVAILABILITY.no;
+
+      remountUI({
+        availableVREntryTypes,
+        forcedVREntryType: qsVREntryType || (!hasVREntryDevice ? "2d" : null),
+        checkingForDeviceAvailability: false
+      });
     }
-  } else {
-    const hasVREntryDevice =
-      availableVREntryTypes.cardboard !== VR_DEVICE_AVAILABILITY.no ||
-      availableVREntryTypes.generic !== VR_DEVICE_AVAILABILITY.no ||
-      availableVREntryTypes.daydream !== VR_DEVICE_AVAILABILITY.no;
-
-    remountUI({ availableVREntryTypes, forcedVREntryType: qsVREntryType || (!hasVREntryDevice ? "2d" : null) });
-  }
+  });
 
   const environmentScene = document.querySelector("#environment-scene");
 
@@ -1232,6 +1285,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (isInitialJoin) {
         store.addEventListener("profilechanged", hubChannel.sendProfileUpdate.bind(hubChannel));
 
+        const requestedOccupants = [];
+
+        const requestOccupants = async (sessionIds, state) => {
+          while (!NAF.connection.isConnected()) await nextTick();
+
+          if (NAF.connection.adapter) {
+            requestedOccupants.length = 0;
+            for (let i = 0; i < sessionIds.length; i++) {
+              const sessionId = sessionIds[i];
+              if (sessionId !== NAF.clientId && state[sessionId].metas[0].presence === "room") {
+                requestedOccupants.push(sessionId);
+              }
+            }
+
+            NAF.connection.adapter.syncOccupants(requestedOccupants);
+          }
+        };
+
         hubChannel.presence.onSync(() => {
           const presence = hubChannel.presence;
 
@@ -1241,7 +1312,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             entryDisallowed: !hubChannel.canEnterRoom(uiProps.hub)
           });
 
-          const occupantCount = Object.entries(presence.state).length;
+          const sessionIds = Object.getOwnPropertyNames(presence.state);
+          const occupantCount = sessionIds.length;
           vrHudPresenceCount.setAttribute("text", "value", occupantCount.toString());
 
           if (occupantCount > 1) {
@@ -1249,6 +1321,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             scene.removeState("copresent");
           }
+
+          requestOccupants(sessionIds, presence.state);
 
           // HACK - Set a flag on the presence object indicating if the initial sync has completed,
           // which is used to determine if we should fire join/leave messages into the presence log.
@@ -1345,6 +1419,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const permsToken = oauthFlowPermsToken || data.perms_token;
       hubChannel.setPermissionsFromToken(permsToken);
 
+      const janusHost = data.hubs[0].host;
+      const janusTurn = data.hubs[0].turn;
+
       scene.addEventListener("adapter-ready", async ({ detail: adapter }) => {
         // HUGE HACK Safari does not like it if the first peer seen does not immediately
         // send audio over its media stream. Otherwise, the stream doesn't work and stays
@@ -1373,6 +1450,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const track = stream.getAudioTracks()[0];
         adapter.setClientId(socket.params().session_id);
         adapter.setJoinToken(data.perms_token);
+        setupPeerConnectionConfig(adapter, janusHost, janusTurn);
+
         hubChannel.addEventListener("permissions-refreshed", e => adapter.setJoinToken(e.detail.permsToken));
 
         // Stop the tone after we've connected, which seems to mitigate the issue without actually

@@ -25,10 +25,9 @@ import { SOUND_ENTER_SCENE } from "./systems/sound-effects-system";
 const isIOS = AFRAME.utils.device.isIOS();
 
 export default class SceneEntryManager {
-  constructor(hubChannel, authChannel, availableVREntryTypes, history) {
+  constructor(hubChannel, authChannel, history) {
     this.hubChannel = hubChannel;
     this.authChannel = authChannel;
-    this.availableVREntryTypes = availableVREntryTypes;
     this.store = window.APP.store;
     this.mediaSearchStore = window.APP.mediaSearchStore;
     this.scene = document.querySelector("a-scene");
@@ -93,6 +92,7 @@ export default class SceneEntryManager {
     if (isBotMode) {
       this._runBot(mediaStream);
       this.scene.addState("entered");
+      this.hubChannel.sendEnteredEvent();
       return;
     }
 

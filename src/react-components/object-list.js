@@ -1,7 +1,9 @@
 import React, { Component } from "react";
+import { FormattedMessage } from "react-intl";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import rootStyles from "../assets/stylesheets/ui-root.scss";
+import objectListStyles from "../assets/stylesheets/object-list-styles.scss";
 import styles from "../assets/stylesheets/presence-list.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCubes } from "@fortawesome/free-solid-svg-icons/faCubes";
@@ -111,9 +113,10 @@ export default class ObjectList extends Component {
 
   domForEntity(el, i) {
     return (
-      <div
+      <button
+        aria-label="Show Object Info Panel"
         key={i}
-        className={styles.rowNoMargin}
+        className={objectListStyles.rowNoMargin}
         onMouseDown={() => {
           this.props.onExpand(false, false);
           this.props.onInspectObject(el);
@@ -128,7 +131,7 @@ export default class ObjectList extends Component {
           AFRAME.scenes[0].systems["hubs-systems"].cameraSystem.inspect(el.object3D, 1.5, true);
         }}
       >
-        <div title={THUMBNAIL_TITLE.get(mediaSortOrder(el))} className={styles.icon}>
+        <div title={THUMBNAIL_TITLE.get(mediaSortOrder(el))} className={objectListStyles.icon}>
           <FontAwesomeIcon icon={DISPLAY_IMAGE.get(mediaSortOrder(el))} />
         </div>
         <div className={classNames({ [styles.listItem]: true })}>
@@ -136,39 +139,44 @@ export default class ObjectList extends Component {
             <p>{getDisplayString(el)}</p>
           </div>
         </div>
-      </div>
+      </button>
     );
   }
 
   renderExpandedList() {
     return (
-      <div className={styles.presenceList}>
-        <div className={styles.contents}>
-          <div className={styles.rows}>{this.state.mediaEntities.map(this.domForEntity.bind(this))}</div>
+      <div className={rootStyles.objectList}>
+        <div className={objectListStyles.contents}>
+          <div className={styles.rows}>
+            {this.state.mediaEntities.length ? (
+              this.state.mediaEntities.map(this.domForEntity.bind(this))
+            ) : (
+              <FormattedMessage id="object-info.no-media" className={styles.listItem} />
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
   render() {
+    const numObjects = (this.state.mediaEntities && this.state.mediaEntities.length) || 0;
     return (
       <div>
-        <div
-          title={"Media"}
+        <button
+          title="Media"
+          aria-label={`Toggle list of ${numObjects} object${numObjects === 1 ? "" : "s"}`}
           onClick={() => {
-            this.props.onExpand(
-              !this.props.expanded && this.state.mediaEntities.length > 0,
-              !AFRAME.utils.device.isMobileVR()
-            );
+            this.props.onExpand(!this.props.expanded, !AFRAME.utils.device.isMobileVR());
           }}
           className={classNames({
-            [rootStyles.objectList]: true,
+            [rootStyles.objectListButton]: true,
             [rootStyles.presenceInfoSelected]: this.props.expanded
           })}
         >
           <FontAwesomeIcon icon={faCubes} />
-          <span className={rootStyles.occupantCount}>{this.state.mediaEntities.length}</span>
-        </div>
+          <span className={rootStyles.mediaCount}>{this.state.mediaEntities.length}</span>
+        </button>
         {this.props.expanded && this.renderExpandedList()}
       </div>
     );
