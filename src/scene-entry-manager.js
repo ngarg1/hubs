@@ -65,7 +65,7 @@ export default class SceneEntryManager {
 
       // HACK - A-Frame calls getVRDisplays at module load, we want to do it here to
       // force gamepads to become live.
-      navigator.getVRDisplays();
+      "getVRDisplays" in navigator && navigator.getVRDisplays();
 
       await exit2DInterstitialAndEnterVR(true);
     }
@@ -109,7 +109,7 @@ export default class SceneEntryManager {
 
     // Delay sending entry event telemetry until VR display is presenting.
     (async () => {
-      while (enterInVR && !(await navigator.getVRDisplays()).find(d => d.isPresenting)) {
+      while (enterInVR && !this.scene.renderer.vr.isPresenting()) {
         await nextTick();
       }
 
@@ -451,6 +451,12 @@ export default class SceneEntryManager {
 
       if (videoTracks.length > 0) {
         newStream.getVideoTracks().forEach(track => mediaStream.addTrack(track));
+
+        if (newStream && newStream.getAudioTracks().length > 0) {
+          const audioSystem = this.scene.systems["hubs-systems"].audioSystem;
+          audioSystem.addStreamToOutboundAudio("screenshare", newStream);
+        }
+
         await NAF.connection.adapter.setLocalMediaStream(mediaStream);
         // currentVideoShareEntity = spawnMediaInfrontOfPlayer(mediaStream, undefined);
         // This is where we need to override.
@@ -473,6 +479,7 @@ export default class SceneEntryManager {
           height: 720,
           frameRate: 30
         }
+        //TODO: Capture audio from camera?
       });
     });
 
@@ -486,7 +493,11 @@ export default class SceneEntryManager {
             height: 720,
             frameRate: 30
           },
-          audio: true
+          audio: {
+            echoCancellation: window.APP.store.state.preferences.disableEchoCancellation === true ? false : true,
+            noiseSuppression: window.APP.store.state.preferences.disableNoiseSuppression === true ? false : true,
+            autoGainControl: window.APP.store.state.preferences.disableAutoGainControl === true ? false : true
+          }
         },
         true
       );
@@ -504,6 +515,9 @@ export default class SceneEntryManager {
       for (const track of mediaStream.getVideoTracks()) {
         mediaStream.removeTrack(track);
       }
+
+      const audioSystem = this.scene.systems["hubs-systems"].audioSystem;
+      audioSystem.removeStreamFromOutboundAudio("screenshare");
 
       await NAF.connection.adapter.setLocalMediaStream(mediaStream);
       currentVideoShareEntity = null;
