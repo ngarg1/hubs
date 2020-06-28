@@ -69,7 +69,7 @@ import ObjectList from "./object-list.js";
 import SettingsMenu from "./settings-menu.js";
 import PreloadOverlay from "./preload-overlay.js";
 import TwoDHUD from "./2d-hud";
-import AppStreamCam from "./app-stream-cam";
+import AppStreamCam from "./app-stream-cam.js";
 import { SpectatingLabel } from "./spectating-label";
 import { showFullScreenIfAvailable, showFullScreenIfWasFullScreen } from "../utils/fullscreen";
 import { exit2DInterstitialAndEnterVR, isIn2DInterstitial } from "../utils/vr-interstitial";
@@ -1628,7 +1628,7 @@ class UIRoot extends Component {
     const showSettingsMenu = !streaming && !preload && !showObjectInfo;
     const showObjectList = !showObjectInfo;
     const showPresenceList = !showObjectInfo;
-    const showCamera = !showObjectInfo;
+    const showCamera = this.props.scene.is("sharing_video");
 
     const displayNameOverride = this.props.hubIsBound
       ? getPresenceProfileForSession(this.props.presences, this.props.sessionId).displayName

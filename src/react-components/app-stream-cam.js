@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 
-class AppStreamCam extends Component {
+export default class AppStreamCam extends Component {
   constructor(props) {
     super(props);
     this.streamCamVideo = this.streamCamVideo.bind(this);
+    this.streamCamVideo();
   }
   streamCamVideo() {
-    const constraints = { audio: true, video: { width: 720, height: 720 } };
+    const constraints = { audio: false, video: { width: 720, height: 720 } };
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then(function(mediaStream) {
@@ -25,13 +26,9 @@ class AppStreamCam extends Component {
     return (
       <div>
         <div id="container">
-          <video autoPlay={true} id="videoElement" controls />
+          <video autoPlay={true} id="videoElement" width="240" height="240" controls />
         </div>
-        <br />
-        <button onClick={this.streamCamVideo}>Start streaming</button>
       </div>
     );
   }
 }
-
-export default { AppStreamCam };
