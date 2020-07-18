@@ -54,7 +54,7 @@ export default class SceneEntryManager {
   enterScene = async (mediaStream, enterInVR, muteOnEntry) => {
     document.getElementById("viewing-camera").removeAttribute("scene-preview-camera");
 
-    if (isDebug && NAF.connection.adapter.session) {
+    if (isDebug) {
       NAF.connection.adapter.session.options.verbose = true;
     }
 
@@ -475,9 +475,9 @@ export default class SceneEntryManager {
       shareVideoMediaStream({
         video: {
           mediaSource: "camera",
-          width: isIOS ? { max: 1280 } : { max: 1280, ideal: 720 },
-          height: 720,
-          frameRate: 30
+          width: isIOS ? { max: 1280 } : { max: 180, ideal: 180 },
+          height: 180,
+          frameRate: 10
         }
         //TODO: Capture audio from camera?
       });
@@ -513,7 +513,6 @@ export default class SceneEntryManager {
       }
 
       for (const track of mediaStream.getVideoTracks()) {
-        track.stop(); // Stop video track to remove the "Stop screen sharing" bar right away.
         mediaStream.removeTrack(track);
       }
 
