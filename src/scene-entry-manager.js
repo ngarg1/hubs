@@ -471,40 +471,14 @@ export default class SceneEntryManager {
     };
 
     this.scene.addEventListener("action_share_camera", () => {
-<<<<<<< HEAD
-      // This is where A frame receives the event
       shareVideoMediaStream({
         video: {
           mediaSource: "camera",
           width: isIOS ? { max: 1280 } : { max: 240, ideal: 240 },
           height: 240,
           frameRate: 20
-=======
-      const constraints = {
-        video: {
-          width: isIOS ? { max: 1280 } : { max: 1280, ideal: 720 },
-          frameRate: 30
->>>>>>> hubs-cloud
         }
-        //TODO: Capture audio from camera?
-      };
-
-      // check preferences
-      const store = window.APP.store;
-      const preferredCamera = store.state.preferences.preferredCamera || "default";
-      switch (preferredCamera) {
-        case "default":
-          constraints.video.mediaSource = "camera";
-          break;
-        case "user":
-        case "environment":
-          constraints.video.facingMode = preferredCamera;
-          break;
-        default:
-          constraints.video.deviceId = preferredCamera;
-          break;
-      }
-      shareVideoMediaStream(constraints);
+      });
     });
 
     this.scene.addEventListener("action_share_screen", () => {
