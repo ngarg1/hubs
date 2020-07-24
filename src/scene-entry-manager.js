@@ -312,7 +312,7 @@ export default class SceneEntryManager {
         true,
         parentEl
       );
-      entity.object3D.scale.set(0.4, 0.4, 0.4); // Set Video Head Scae to Custom Initial Value
+      entity.object3D.scale.set(0.4, 0.4, 0.4);
 
       const headSpawnOffset = { x: 0, y: 0, z: -0.025 };
       orientation.then(or => {
@@ -458,8 +458,6 @@ export default class SceneEntryManager {
         }
 
         await NAF.connection.adapter.setLocalMediaStream(mediaStream);
-        // currentVideoShareEntity = spawnMediaInfrontOfPlayer(mediaStream, undefined);
-        // This is where we need to override.
         currentVideoShareEntity = spawnMediaOnPlayerHead(mediaStream, undefined);
         // Wire up custom removal event which will stop the stream.
         currentVideoShareEntity.setAttribute("emit-scene-event-on-remove", "event:action_end_video_sharing");

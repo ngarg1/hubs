@@ -478,8 +478,7 @@ class UIRoot extends Component {
   };
 
   shareVideo = mediaSource => {
-    this.props.scene.emit(`action_share_${mediaSource}`); // this action sends the state change from react to A-frame
-  };
+    this.props.scene.emit(`action_share_${mediaSource}`);
 
   endShareVideo = () => {
     this.props.scene.emit("action_end_video_sharing");
