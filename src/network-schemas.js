@@ -169,12 +169,36 @@ function registerNetworkSchemas() {
       {
         component: "media-video",
         property: "time"
+      },
+      {
+        component: "position",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      {
+        component: "rotation",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.5)
+      },
+      {
+        component: "scale",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
       }
     ],
     nonAuthorizedComponents: [
       {
         component: "media-video",
         property: "time"
+      },
+      {
+        component: "position",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      {
+        component: "rotation",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.5)
+      },
+      {
+        component: "scale",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
       }
     ]
   });
@@ -229,6 +253,39 @@ function registerNetworkSchemas() {
         requiresNetworkUpdate: vectorRequiresUpdate(0.001)
       },
       "networked-drawing"
+    ]
+  });
+
+  NAF.schemas.add({
+    template: "#video-head",
+    components: [
+      {
+        component: "position",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      {
+        component: "rotation",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.5)
+      },
+      {
+        component: "scale",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      "media-loader"
+    ],
+    nonAuthorizedComponents: [
+      {
+        component: "position",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      },
+      {
+        component: "rotation",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.5)
+      },
+      {
+        component: "scale",
+        requiresNetworkUpdate: vectorRequiresUpdate(0.001)
+      }
     ]
   });
 

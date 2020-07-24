@@ -68,6 +68,7 @@ import ObjectList from "./object-list.js";
 import SettingsMenu from "./settings-menu.js";
 import PreloadOverlay from "./preload-overlay.js";
 import TwoDHUD from "./2d-hud";
+import AppStreamCam from "./app-stream-cam.js";
 import { SpectatingLabel } from "./spectating-label";
 import { showFullScreenIfAvailable, showFullScreenIfWasFullScreen } from "../utils/fullscreen";
 import { exit2DInterstitialAndEnterVR, isIn2DInterstitial } from "../utils/vr-interstitial";
@@ -478,7 +479,6 @@ class UIRoot extends Component {
 
   shareVideo = mediaSource => {
     this.props.scene.emit(`action_share_${mediaSource}`);
-  };
 
   endShareVideo = () => {
     this.props.scene.emit("action_end_video_sharing");
@@ -1599,6 +1599,7 @@ class UIRoot extends Component {
     const showSettingsMenu = !streaming && !preload && !showObjectInfo;
     const showObjectList = !showObjectInfo;
     const showPresenceList = !showObjectInfo;
+    const showCamera = this.props.scene.is("sharing_video");
 
     const displayNameOverride = this.props.hubIsBound
       ? getPresenceProfileForSession(this.props.presences, this.props.sessionId).displayName
@@ -2055,6 +2056,8 @@ class UIRoot extends Component {
                 onInspectObject={el => switchToInspectingObject(el)}
               />
             )}
+
+            {showCamera && <AppStreamCam />}
 
             {showPresenceList && (
               <PresenceList

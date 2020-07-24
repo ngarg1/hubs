@@ -34,6 +34,7 @@ export default class SceneEntryManager {
     this.rightCursorController = document.getElementById("right-cursor-controller");
     this.leftCursorController = document.getElementById("left-cursor-controller");
     this.avatarRig = document.getElementById("avatar-rig");
+    this.avatarPovNode = document.getElementById("avatar-pov-node");
     this._entered = false;
     this.performConditionalSignIn = () => {};
     this.history = history;
@@ -53,7 +54,7 @@ export default class SceneEntryManager {
   enterScene = async (mediaStream, enterInVR, muteOnEntry) => {
     document.getElementById("viewing-camera").removeAttribute("scene-preview-camera");
 
-    if (isDebug && NAF.connection.adapter.session) {
+    if (isDebug) {
       NAF.connection.adapter.session.options.verbose = true;
     }
 
@@ -272,7 +273,7 @@ export default class SceneEntryManager {
   };
 
   _setupMedia = mediaStream => {
-    const offset = { x: 0, y: 0, z: -1.5 };
+    const offset = { x: 0, y: 0, z: 0 };
     const spawnMediaInfrontOfPlayer = (src, contentOrigin) => {
       if (!this.hubChannel.can("spawn_and_move_media")) return;
       const { entity, orientation } = addMedia(
@@ -286,8 +287,40 @@ export default class SceneEntryManager {
       orientation.then(or => {
         entity.setAttribute("offset-relative-to", {
           target: "#avatar-pov-node",
-          offset,
+          offset: offset,
           orientation: or
+        });
+      });
+
+      return entity;
+    };
+
+    const spawnMediaOnPlayerHead = (src, contentOrigin) => {
+      // TODO: Code this
+      if (!this.hubChannel.can("spawn_and_move_media")) return;
+      const parentEl = document.getElementById("avatar-rig").querySelector(".camera");
+      parentEl.setAttribute("networked", { template: "#static-media" });
+      const { entity, orientation } = addMedia(
+        src,
+        "#static-media",
+        contentOrigin,
+        null,
+        !(src instanceof MediaStream),
+        true,
+        true,
+        {},
+        true,
+        parentEl
+      );
+      entity.object3D.scale.set(0.4, 0.4, 0.4);
+
+      const headSpawnOffset = { x: 0, y: 0, z: -0.025 };
+      orientation.then(or => {
+        entity.setAttribute("offset-relative-to", {
+          target: "#avatar-pov-node",
+          offset: headSpawnOffset,
+          orientation: or,
+          lookAt: true
         });
       });
 
@@ -425,8 +458,7 @@ export default class SceneEntryManager {
         }
 
         await NAF.connection.adapter.setLocalMediaStream(mediaStream);
-        currentVideoShareEntity = spawnMediaInfrontOfPlayer(mediaStream, undefined);
-
+        currentVideoShareEntity = spawnMediaOnPlayerHead(mediaStream, undefined);
         // Wire up custom removal event which will stop the stream.
         currentVideoShareEntity.setAttribute("emit-scene-event-on-remove", "event:action_end_video_sharing");
       }
@@ -437,30 +469,14 @@ export default class SceneEntryManager {
     };
 
     this.scene.addEventListener("action_share_camera", () => {
-      const constraints = {
+      shareVideoMediaStream({
         video: {
-          width: isIOS ? { max: 1280 } : { max: 1280, ideal: 720 },
-          frameRate: 30
+          mediaSource: "camera",
+          width: isIOS ? { max: 1280 } : { max: 240, ideal: 240 },
+          height: 240,
+          frameRate: 20
         }
-        //TODO: Capture audio from camera?
-      };
-
-      // check preferences
-      const store = window.APP.store;
-      const preferredCamera = store.state.preferences.preferredCamera || "default";
-      switch (preferredCamera) {
-        case "default":
-          constraints.video.mediaSource = "camera";
-          break;
-        case "user":
-        case "environment":
-          constraints.video.facingMode = preferredCamera;
-          break;
-        default:
-          constraints.video.deviceId = preferredCamera;
-          break;
-      }
-      shareVideoMediaStream(constraints);
+      });
     });
 
     this.scene.addEventListener("action_share_screen", () => {
@@ -493,7 +509,6 @@ export default class SceneEntryManager {
       }
 
       for (const track of mediaStream.getVideoTracks()) {
-        track.stop(); // Stop video track to remove the "Stop screen sharing" bar right away.
         mediaStream.removeTrack(track);
       }
 
@@ -557,6 +572,7 @@ export default class SceneEntryManager {
     this.avatarRig.setAttribute("networked", "template: #remote-avatar; attachTemplateToLocal: false;");
     this.avatarRig.setAttribute("networked-avatar", "");
     this.avatarRig.emit("entered");
+    this.scene.emit("action_share_camera");
   };
 
   _runBot = async mediaStream => {

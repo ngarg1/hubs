@@ -211,7 +211,20 @@
 
             <template id="static-media">
                 <a-entity
-                    body-helper="type: static; mass: 1; collisionFilterGroup: 1; collisionFilterMask: 1;"
+                    matrix-auto-update
+                    body-helper="type: static; mass: 1; collisionFilterGroup: 1; collisionFilterMask: 11;"
+                    listed-media
+                    set-yxz-order
+                >
+                </a-entity>
+            </template>
+
+            <template id="video-head">
+                <a-entity
+                        matrix-auto-update
+                        body-helper="type: static; mass: 1; collisionFilterGroup: 1; collisionFilterMask: 11;"
+                        listed-media
+                        set-yxz-order
                 >
                 </a-entity>
             </template>
@@ -1158,6 +1171,7 @@
                 rotation
                 pitch-yaw-rotator
                 set-yxz-order
+                periodic-full-syncs
                 position="0 1.6 0"
             >
                 <a-entity
