@@ -101,7 +101,7 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "screenfull": "^4.0.1",
-    "three": "github:mozillareality/three.js#hubs/master",
+    "three": "github:honeyimholm/three.js#hubs/master",
     "three-ammo": "^1.0.11",
     "three-bmfont-text": "github:mozillareality/three-bmfont-text#hubs/master",
     "three-mesh-bvh": "^0.1.2",
