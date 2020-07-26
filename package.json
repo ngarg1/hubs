@@ -32,7 +32,8 @@
     "stats": "rimraf ./dist && webpack --mode=production --json",
     "spritesheet": "npm run spritesheet:system-action && npm run spritesheet:system-notice",
     "spritesheet:system-action": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-action-spritesheet --powerOfTwo src/assets/images/sprites/action/*",
-    "spritesheet:system-notice": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-notice-spritesheet --powerOfTwo src/assets/images/sprites/notice/*"
+    "spritesheet:system-notice": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-notice-spritesheet --powerOfTwo src/assets/images/sprites/notice/*",
+    "postinstall": " rm ./node_modules/three/src/textures/VideoTexture.js && curl https://raw.githubusercontent.com/honeyimholm/three.js/f8f6f62a043a4988bd3bcc3693efc7f32f0ef392/src/textures/VideoTexture.js > ./node_modules/three/src/textures/VideoTexture.js"
   },
   "ava": {
     "files": [
@@ -101,7 +102,7 @@
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
     "screenfull": "^4.0.1",
-    "three": "github:honeyimholm/three.js#hubs/master",
+    "three": "github:mozillareality/three.js#hubs/master",
     "three-ammo": "^1.0.11",
     "three-bmfont-text": "github:mozillareality/three-bmfont-text#hubs/master",
     "three-mesh-bvh": "^0.1.2",
