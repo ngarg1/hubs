@@ -16,7 +16,7 @@
     "start": "webpack-dev-server --mode=development --env.loadAppConfig",
     "dev": "webpack-dev-server --mode=development --env.remoteDev",
     "local": "webpack-dev-server --mode=development --env.localDev",
-    "build": "rimraf ./dist && webpack --mode=production",
+    "build": "bash ./scripts/video-texture-patch.sh && rimraf ./dist && webpack --mode=production",
     "bundle-analyzer": "webpack-dev-server --mode=production --env.dev --env.bundleAnalyzer",
     "doc": "node ./scripts/doc/build.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
@@ -33,7 +33,7 @@
     "spritesheet": "npm run spritesheet:system-action && npm run spritesheet:system-notice",
     "spritesheet:system-action": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-action-spritesheet --powerOfTwo src/assets/images/sprites/action/*",
     "spritesheet:system-notice": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-notice-spritesheet --powerOfTwo src/assets/images/sprites/notice/*",
-    "postinstall": " rm ./node_modules/three/src/textures/VideoTexture.js && curl https://raw.githubusercontent.com/honeyimholm/three.js/f8f6f62a043a4988bd3bcc3693efc7f32f0ef392/src/textures/VideoTexture.js > ./node_modules/three/src/textures/VideoTexture.js"
+    "postinstall": "rm ./node_modules/three/src/textures/VideoTexture.js && curl https://raw.githubusercontent.com/honeyimholm/three.js/f8f6f62a043a4988bd3bcc3693efc7f32f0ef392/src/textures/VideoTexture.js > ./node_modules/three/src/textures/VideoTexture.js"
   },
   "ava": {
     "files": [
