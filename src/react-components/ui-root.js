@@ -479,6 +479,7 @@ class UIRoot extends Component {
 
   shareVideo = mediaSource => {
     this.props.scene.emit(`action_share_${mediaSource}`);
+  };
 
   endShareVideo = () => {
     this.props.scene.emit("action_end_video_sharing");
