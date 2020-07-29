@@ -1,6 +1,7 @@
 // Monkey patches three.js to stop doing texture uploads for paused videos
+THREE.VideoTexture.prototype.update = function() {
 // -- Soical Hubs: Applying another monkey patch to three.js for running videos at 40 frames
-THREE.VideoTexture.prototype.update = setInterval(function() {
+//THREE.VideoTexture.prototype.update = setInterval(function() {
   const video = this.image;
   const paused = video.paused;
 
@@ -16,4 +17,5 @@ THREE.VideoTexture.prototype.update = setInterval(function() {
 
     this.needsUpdate = true;
   }
-}, 1000/25);
+};
+//}, 1000/25);

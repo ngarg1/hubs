@@ -7,6 +7,8 @@ then
 
   # download custom patched file
   curl https://raw.githubusercontent.com/honeyimholm/three.js/hubs/master/three.module.js > ./node_modules/three/build/three.module.js
+  curl https://raw.githubusercontent.com/honeyimholm/three.js/hubs/master/src/textures/Texture.js > 
 
+  #TODO change the three.module.js directly!
   echo "done downloading"
 fi
