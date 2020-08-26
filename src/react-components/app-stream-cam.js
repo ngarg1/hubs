@@ -26,7 +26,9 @@ export default class AppStreamCam extends Component {
     return (
       <div>
         <div id="container">
-          <video autoPlay={true} id="videoElement" width="240" height="240" controls />
+          { !AFRAME.utils.device.isIOS()&&
+            <video autoPlay={true} id="videoElement" width="240" height="240" controls />
+          }
         </div>
       </div>
     );
