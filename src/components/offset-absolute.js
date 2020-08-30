@@ -16,7 +16,7 @@ AFRAME.registerComponent("offset-absolute", {
       type: "string"
     },
     orientation: {
-      default: 1 // see doc/image_orientations.gif
+      default: 2 // see doc/image_orientations.gif
     },
     selfDestruct: {
       default: false
@@ -46,14 +46,14 @@ AFRAME.registerComponent("offset-absolute", {
     return function() {
       const obj = this.el.object3D;
       obj.position.copy(this.data.offset);
-
+      const QUARTER_CIRCLE = Math.PI / 2;
       // DEBUG
       obj.getWorldPosition(debugVec);
       console.log("media pos: " + debugVec);
 
       // NOTE: ROTATION CODE
       // See doc/image_orientations.gif
-      switch (this.data.orientation) {
+      /*switch (this.data.orientation) {
         case 8:
           obj.rotateOnAxis(z, 3 * QUARTER_CIRCLE);
           break;
@@ -82,7 +82,9 @@ AFRAME.registerComponent("offset-absolute", {
         default:
           break;
       }
-
+      */
+     //hard coding rotation
+      obj.rotateOnAxis(y, 2 * QUARTER_CIRCLE);
       obj.matrixNeedsUpdate = true;
 
       if (this.data.selfDestruct) {
