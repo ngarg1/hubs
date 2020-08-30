@@ -273,7 +273,7 @@ export default class SceneEntryManager {
   };
 
   _setupMedia = mediaStream => {
-    const offset = { x: 0, y: 0, z: 0 };
+    const offset = { x: -1, y: 4, z: 9 };
     const spawnMediaInfrontOfPlayer = (src, contentOrigin) => {
       if (!this.hubChannel.can("spawn_and_move_media")) return;
       const { entity, orientation } = addMedia(
@@ -284,16 +284,16 @@ export default class SceneEntryManager {
         !(src instanceof MediaStream),
         true
       );
+
+      // TODO: maybe add hub ID
       orientation.then(or => {
-        entity.setAttribute("offset-relative-to", {
+        entity.setAttribute("offset-absolute", {
           target: "#avatar-pov-node",
           offset: offset,
           orientation: or
         });
       });
 
-      return entity;
-    };
 
     const spawnMediaOnPlayerHead = (src, contentOrigin) => {
       // TODO: Code this
