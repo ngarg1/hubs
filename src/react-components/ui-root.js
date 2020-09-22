@@ -2156,21 +2156,6 @@ class UIRoot extends Component {
                       </div>
                     </IfFeature>
                   )}
-
-                {!streaming && (
-                  <button
-                    aria-label="Toggle Favorited"
-                    onClick={() => this.toggleFavorited()}
-                    className={classNames({
-                      [entryStyles.favorited]: this.isFavorited(),
-                      [styles.inRoomFavoriteButton]: true
-                    })}
-                  >
-                    <i title="Favorite">
-                      <FontAwesomeIcon icon={faStar} />
-                    </i>
-                  </button>
-                )}
               </div>
             )}
           </div>
