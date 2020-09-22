@@ -255,7 +255,7 @@
     "invite.enter_via_modal": "Others may enter via ",
     "invite.tweet": "tweet",
     "invite.and_enter_code": " code:",
-    "invite.duration_of_code" : "new code every 72 hours",
+    "invite.duration_of_code": "new code every 72 hours",
     "invite.or_visit": "Share room link:",
     "invite.or_visit_modal": "or by visiting permalink",
     "invite.embed": "or embed on a page",
@@ -350,7 +350,6 @@
     "tips.mobile.invite": "Use the Share button to share this room.",
     "tips.mobile.feedback": "🦆 Quack! Want to help Hubs?",
     "tips.mobile.feedback-link": "Tell the Duck.",
-    "tips.desktop.video_share_mode": "You're streaming. Select again to stop sharing video.",
     "tips.desktop.pen_mode": "Press ESC or right click to drop pen. Ctrl-Z to undo.",
     "tips.desktop.mute_mode": "You are muted. Click or press M to un-mute.",
     "tips.desktop.look": "Welcome to %app-name%! Let's take a quick tour. 👋 Click and drag to look around.",
@@ -448,7 +447,7 @@
     "support.supported": "supported",
     "support.unsupported": "unsupported"
   },
-   "cn-zh": {
+  "cn-zh": {
     "app-name": "App",
     "editor-name": "Scene Editor",
     "contact-email": "app@company.com",
@@ -703,7 +702,7 @@
     "invite.enter_via_modal": "其他人可以进入通过 ",
     "invite.tweet": "tweet",
     "invite.and_enter_code": " 号码:",
-    "invite.duration_of_code" : "每72小时产生一次新号码",
+    "invite.duration_of_code": "每72小时产生一次新号码",
     "invite.or_visit": "分享房间链接:",
     "invite.or_visit_modal": "或是通过永久链接访问",
     "invite.embed": "或是嵌入到网页里",
