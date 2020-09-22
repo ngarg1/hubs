@@ -64,7 +64,6 @@ import PreferencesScreen from "./preferences-screen.js";
 import OutputLevelWidget from "./output-level-widget.js";
 import PresenceLog from "./presence-log.js";
 import PresenceList from "./presence-list.js";
-import ObjectList from "./object-list.js";
 import SettingsMenu from "./settings-menu.js";
 import PreloadOverlay from "./preload-overlay.js";
 import TwoDHUD from "./2d-hud";
@@ -2035,28 +2034,6 @@ class UIRoot extends Component {
               </button>
             )}
             {streamingTip}
-
-            {showObjectList && (
-              <ObjectList
-                scene={this.props.scene}
-                onExpand={(expand, uninspect) => {
-                  if (expand) {
-                    this.setState({ isPresenceListExpanded: false, isObjectListExpanded: expand });
-                  } else {
-                    this.setState({ isObjectListExpanded: expand });
-                  }
-
-                  if (uninspect) {
-                    this.setState({ objectInfo: null });
-                    if (this.props.scene.systems["hubs-systems"].cameraSystem.mode === CAMERA_MODE_INSPECT) {
-                      this.props.scene.systems["hubs-systems"].cameraSystem.uninspect();
-                    }
-                  }
-                }}
-                expanded={this.state.isObjectListExpanded && !this.state.isPresenceListExpanded}
-                onInspectObject={el => switchToInspectingObject(el)}
-              />
-            )}
 
             {showCamera && <AppStreamCam />}
 
