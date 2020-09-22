@@ -111,10 +111,13 @@
   position: absolute;
   z-index: 2;
   bottom: 20px;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
-  width: 95%;
+  /* Removing code that centers input bar on the bottom of the screen
+   * left: 5%;
+   * -webkit-transform: translateX(-50%);
+   * transform: translateX(-50%);
+   */
+  margin-left: 16px;
+  width: 40%;
   max-width: 700px;
   height: 48px;
   display: flex;
