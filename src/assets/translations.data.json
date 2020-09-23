@@ -351,6 +351,7 @@
     "tips.mobile.feedback": "🦆 Quack! Want to help Hubs?",
     "tips.mobile.feedback-link": "Tell the Duck.",
     "tips.desktop.pen_mode": "Press ESC or right click to drop pen. Ctrl-Z to undo.",
+    "tips.desktop.video_share_mode": "",
     "tips.desktop.mute_mode": "You are muted. Click or press M to un-mute.",
     "tips.desktop.look": "Welcome to %app-name%! Let's take a quick tour. 👋 Click and drag to look around.",
     "tips.desktop.locomotion": "Use the W A S D keys to move. Hold shift to boost.",
