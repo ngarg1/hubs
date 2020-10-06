@@ -1108,22 +1108,6 @@ class UIRoot extends Component {
         {!this.state.waitingOnAudio &&
           !this.props.entryDisallowed && (
             <div className={entryStyles.buttonContainer}>
-              {!isMobileVR && (
-                <button
-                  onClick={e => {
-                    e.preventDefault();
-                    this.attemptLink();
-                  }}
-                  className={classNames([entryStyles.secondaryActionButton, entryStyles.wideButton])}
-                >
-                  <FormattedMessage id="entry.device-medium" />
-                  <div className={entryStyles.buttonSubtitle}>
-                    <FormattedMessage
-                      id={isMobile ? "entry.device-subtitle-mobile" : "entry.device-subtitle-desktop"}
-                    />
-                  </div>
-                </button>
-              )}
               {configs.feature("enable_lobby_ghosts") ? (
                 <button
                   onClick={e => {
