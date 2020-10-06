@@ -1214,17 +1214,6 @@ class UIRoot extends Component {
                 <FormattedMessage id="entry.checkingForDeviceAvailability" />
               </div>
             )}
-            {this.props.availableVREntryTypes.cardboard !== VR_DEVICE_AVAILABILITY.no && (
-              <div className={entryStyles.secondary} onClick={this.enterVR}>
-                <FormattedMessage id="entry.cardboard" />
-              </div>
-            )}
-            {this.props.availableVREntryTypes.generic !== VR_DEVICE_AVAILABILITY.no && (
-              <GenericEntryButton secondary={true} onClick={this.enterVR} />
-            )}
-            {this.props.availableVREntryTypes.daydream === VR_DEVICE_AVAILABILITY.yes && (
-              <DaydreamEntryButton secondary={true} onClick={this.enterDaydream} subtitle={null} />
-            )}
             {this.props.availableVREntryTypes.screen === VR_DEVICE_AVAILABILITY.yes && (
               <TwoDEntryButton autoFocus={true} onClick={this.enter2D} />
             )}
