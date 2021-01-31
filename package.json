@@ -16,7 +16,7 @@
     "start": "webpack-dev-server --mode=development --env.loadAppConfig",
     "dev": "webpack-dev-server --mode=development --env.remoteDev",
     "local": "webpack-dev-server --mode=development --env.localDev",
-    "build": "rimraf ./dist && webpack --mode=production",
+    "build": "bash ./scripts/video-texture-patch.sh && rimraf ./dist && webpack --mode=production",
     "bundle-analyzer": "webpack-dev-server --mode=production --env.dev --env.bundleAnalyzer",
     "doc": "node ./scripts/doc/build.js",
     "prettier": "prettier --write '*.js' 'src/**/*.js'",
@@ -32,7 +32,8 @@
     "stats": "rimraf ./dist && webpack --mode=production --json",
     "spritesheet": "npm run spritesheet:system-action && npm run spritesheet:system-notice",
     "spritesheet:system-action": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-action-spritesheet --powerOfTwo src/assets/images/sprites/action/*",
-    "spritesheet:system-notice": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-notice-spritesheet --powerOfTwo src/assets/images/sprites/notice/*"
+    "spritesheet:system-notice": "spritesheet-js -f json -p src/assets/images/spritesheets/ --padding 8 --divisibleByTwo -n sprite-system-notice-spritesheet --powerOfTwo src/assets/images/sprites/notice/*",
+    "postinstall": "bash ./scripts/video-texture-patch.sh"
   },
   "ava": {
     "files": [

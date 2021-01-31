@@ -718,6 +718,7 @@ AFRAME.registerComponent("media-video", {
         isReady = () => true;
       } else {
         texture = new THREE.VideoTexture(videoEl);
+        texture.frameRate = 25
         texture.minFilter = THREE.LinearFilter;
         texture.encoding = THREE.sRGBEncoding;
         isReady = () =>

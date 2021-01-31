@@ -16,6 +16,7 @@ import { createAndRedirectToNewHub } from "../../utils/phoenix-utils";
 import { MediaGrid } from "./MediaGrid";
 import { RoomTile } from "./RoomTile";
 
+
 addLocaleData([...en]);
 
 export function HomePage() {
@@ -71,10 +72,6 @@ export function HomePage() {
               <FormattedMessage id="app-description" />
             </div>
           )}
-        </div>
-        <div className={styles.ctaButtons}>
-          {canCreateRooms && <CreateRoomButton />}
-          <PWAButton />
         </div>
       </section>
       {featuredRooms.length > 0 && (

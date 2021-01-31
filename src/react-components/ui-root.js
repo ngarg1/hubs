@@ -64,7 +64,6 @@ import PreferencesScreen from "./preferences-screen.js";
 import OutputLevelWidget from "./output-level-widget.js";
 import PresenceLog from "./presence-log.js";
 import PresenceList from "./presence-list.js";
-import ObjectList from "./object-list.js";
 import SettingsMenu from "./settings-menu.js";
 import PreloadOverlay from "./preload-overlay.js";
 import TwoDHUD from "./2d-hud";
@@ -1109,22 +1108,6 @@ class UIRoot extends Component {
         {!this.state.waitingOnAudio &&
           !this.props.entryDisallowed && (
             <div className={entryStyles.buttonContainer}>
-              {!isMobileVR && (
-                <button
-                  onClick={e => {
-                    e.preventDefault();
-                    this.attemptLink();
-                  }}
-                  className={classNames([entryStyles.secondaryActionButton, entryStyles.wideButton])}
-                >
-                  <FormattedMessage id="entry.device-medium" />
-                  <div className={entryStyles.buttonSubtitle}>
-                    <FormattedMessage
-                      id={isMobile ? "entry.device-subtitle-mobile" : "entry.device-subtitle-desktop"}
-                    />
-                  </div>
-                </button>
-              )}
               {configs.feature("enable_lobby_ghosts") ? (
                 <button
                   onClick={e => {
@@ -1230,17 +1213,6 @@ class UIRoot extends Component {
                 </div>
                 <FormattedMessage id="entry.checkingForDeviceAvailability" />
               </div>
-            )}
-            {this.props.availableVREntryTypes.cardboard !== VR_DEVICE_AVAILABILITY.no && (
-              <div className={entryStyles.secondary} onClick={this.enterVR}>
-                <FormattedMessage id="entry.cardboard" />
-              </div>
-            )}
-            {this.props.availableVREntryTypes.generic !== VR_DEVICE_AVAILABILITY.no && (
-              <GenericEntryButton secondary={true} onClick={this.enterVR} />
-            )}
-            {this.props.availableVREntryTypes.daydream === VR_DEVICE_AVAILABILITY.yes && (
-              <DaydreamEntryButton secondary={true} onClick={this.enterDaydream} subtitle={null} />
             )}
             {this.props.availableVREntryTypes.screen === VR_DEVICE_AVAILABILITY.yes && (
               <TwoDEntryButton autoFocus={true} onClick={this.enter2D} />
@@ -2036,28 +2008,6 @@ class UIRoot extends Component {
             )}
             {streamingTip}
 
-            {showObjectList && (
-              <ObjectList
-                scene={this.props.scene}
-                onExpand={(expand, uninspect) => {
-                  if (expand) {
-                    this.setState({ isPresenceListExpanded: false, isObjectListExpanded: expand });
-                  } else {
-                    this.setState({ isObjectListExpanded: expand });
-                  }
-
-                  if (uninspect) {
-                    this.setState({ objectInfo: null });
-                    if (this.props.scene.systems["hubs-systems"].cameraSystem.mode === CAMERA_MODE_INSPECT) {
-                      this.props.scene.systems["hubs-systems"].cameraSystem.uninspect();
-                    }
-                  }
-                }}
-                expanded={this.state.isObjectListExpanded && !this.state.isPresenceListExpanded}
-                onInspectObject={el => switchToInspectingObject(el)}
-              />
-            )}
-
             {showCamera && <AppStreamCam />}
 
             {showPresenceList && (
@@ -2156,21 +2106,6 @@ class UIRoot extends Component {
                       </div>
                     </IfFeature>
                   )}
-
-                {!streaming && (
-                  <button
-                    aria-label="Toggle Favorited"
-                    onClick={() => this.toggleFavorited()}
-                    className={classNames({
-                      [entryStyles.favorited]: this.isFavorited(),
-                      [styles.inRoomFavoriteButton]: true
-                    })}
-                  >
-                    <i title="Favorite">
-                      <FontAwesomeIcon icon={faStar} />
-                    </i>
-                  </button>
-                )}
               </div>
             )}
           </div>

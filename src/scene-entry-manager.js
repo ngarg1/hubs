@@ -272,26 +272,58 @@ export default class SceneEntryManager {
     this.hubChannel.unpin(networkId, fileId);
   };
 
+  //TODO: make this code modular by referencing a JSON with the room info created in the constructor
   _setupMedia = mediaStream => {
-    const offset = { x: 0, y: 0, z: 0 };
-    const spawnMediaInfrontOfPlayer = (src, contentOrigin) => {
-      if (!this.hubChannel.can("spawn_and_move_media")) return;
-      const { entity, orientation } = addMedia(
-        src,
-        "#interactable-media",
-        contentOrigin,
-        null,
-        !(src instanceof MediaStream),
-        true
-      );
-      orientation.then(or => {
-        entity.setAttribute("offset-relative-to", {
-          target: "#avatar-pov-node",
-          offset: offset,
-          orientation: or
+    const hubId =
+    qs.get("hub_id") ||
+    (document.location.pathname === "/" && defaultRoomId
+      ? defaultRoomId
+      : document.location.pathname.substring(1).split("/")[0]);
+    //only make absolute offset spawning media available in the movie room
+    if(hubId === "LCx3m9r") {
+      const offset = { x: 2.5, y: 6.5, z: 11 };
+      const spawnMediaInfrontOfPlayer = (src, contentOrigin) => {
+        if (!this.hubChannel.can("spawn_and_move_media")) return;
+        const { entity, orientation } = addMedia(
+          src,
+          "#interactable-media",
+          contentOrigin,
+          null,
+          !(src instanceof MediaStream),
+          true
+        );
+        entity.object3D.scale.set(20, 20, 20);
+        orientation.then(or => {
+          entity.setAttribute("offset-absolute", {
+            target: "#avatar-pov-node",
+            offset: offset,
+            //hard coding in rotation
+            //orientation: 1
+          });
         });
-      });
-
+      }
+    }
+    else {
+        const offset = { x: 0, y: 0, z: 0 };
+      const spawnMediaInfrontOfPlayer = (src, contentOrigin) => {
+        if (!this.hubChannel.can("spawn_and_move_media")) return;
+        const { entity, orientation } = addMedia(
+          src,
+          "#interactable-media",
+          contentOrigin,
+          null,
+          !(src instanceof MediaStream),
+          true
+        );
+        orientation.then(or => {
+          entity.setAttribute("offset-relative-to", {
+            target: "#avatar-pov-node",
+            offset: offset,
+            orientation: or
+          });
+        });
+      }
+    }
       return entity;
     };
 
@@ -437,6 +469,7 @@ export default class SceneEntryManager {
 
       try {
         if (isDisplayMedia) {
+          //TODO: get audio stream from user's computer
           newStream = await navigator.mediaDevices.getDisplayMedia(constraints);
         } else {
           newStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -458,7 +491,13 @@ export default class SceneEntryManager {
         }
 
         await NAF.connection.adapter.setLocalMediaStream(mediaStream);
-        currentVideoShareEntity = spawnMediaOnPlayerHead(mediaStream, undefined);
+        //changing to spawn screen sharing on big screen
+        if(constraints.source.isScreenShare){
+          currentVideoShareEntity = spawnMediaInfrontOfPlayer(mediaStream, undefined);
+        }
+        else{
+          currentVideoShareEntity = spawnMediaOnPlayerHead(mediaStream, undefined);
+        }
         // Wire up custom removal event which will stop the stream.
         currentVideoShareEntity.setAttribute("emit-scene-event-on-remove", "event:action_end_video_sharing");
       }
@@ -475,7 +514,11 @@ export default class SceneEntryManager {
           width: isIOS ? { max: 1280 } : { max: 240, ideal: 240 },
           height: 240,
           frameRate: 20
-        }
+        },
+        source: 
+          {
+            isScreenShare: false
+          }
       });
     });
 
@@ -485,16 +528,21 @@ export default class SceneEntryManager {
           video: {
             // Work around BMO 1449832 by calculating the width. This will break for multi monitors if you share anything
             // other than your current monitor that has a different aspect ratio.
-            width: 720 * (screen.width / screen.height),
-            height: 720,
+            width: 1280 * (screen.width / screen.height),
+            height: 1280,
             frameRate: 30
           },
           audio: {
             echoCancellation: window.APP.store.state.preferences.disableEchoCancellation === true ? false : true,
             noiseSuppression: window.APP.store.state.preferences.disableNoiseSuppression === true ? false : true,
             autoGainControl: window.APP.store.state.preferences.disableAutoGainControl === true ? false : true
+          },
+          source: 
+          {
+            isScreenShare: true
           }
         },
+        //changing this to false makes it a camera grab
         true
       );
     });

@@ -146,11 +146,14 @@
   position: absolute;
   bottom: 64px;
   z-index: 1;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
-  width: 95%;
+  /*
+   * left: 50%;
+   * -webkit-transform: translateX(-50%);
+   * transform: translateX(-50%);
+   * width: 95%;
+   */
   max-width: 700px;
+  margin-left: 8px;
 
   :local(.presence-log-entry) {
     background-color: var(--hud-panel-background);

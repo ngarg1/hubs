@@ -135,8 +135,9 @@ class TopHUD extends Component {
     const isMobile = AFRAME.utils.device.isMobile() || AFRAME.utils.device.isMobileVR();
 
     const videoShareExtraOptionTypes = [];
-    const primaryVideoShareType =
-      this.props.videoShareMediaSource || this.state.lastActiveMediaSource || (isMobile ? "camera" : "screen");
+    const primaryVideoShareType = this.props.videoShareMediaSource
+      || this.state.lastActiveMediaSource
+      || (isMobile ? "camera" : "screen");
 
     if (this.state.showVideoShareOptions) {
       videoShareExtraOptionTypes.push(primaryVideoShareType);
@@ -171,6 +172,7 @@ class TopHUD extends Component {
     };
 
     const capitalize = str => str[0].toUpperCase() + str.slice(1);
+
     const iconForType = (type, active) => {
       if (active) {
         return type === "screen" ? ShareScreenIconActive : ShareCameraIconActive;
@@ -197,27 +199,33 @@ class TopHUD extends Component {
           className={cx(styles.iconButtonIcon)}
           src={iconForType(primaryVideoShareType, this.props.videoShareMediaSource === primaryVideoShareType)}
         />
-        {videoShareExtraOptionTypes.length > 0 && (
-          <div className={cx(styles.videoShareExtraOptions)} onMouseOut={hideExtrasOnOut}>
-            {videoShareExtraOptionTypes.map(type => (
-              <div
-                key={type}
-                className={cx(styles.iconButton, {
-                  [styles.disabled]: this.state.mediaDisabled
-                })}
-                title={
-                  this.props.videoShareMediaSource === type
+
+        { /* If there are multiple video options, show a drop down of all video options */
+          videoShareExtraOptionTypes.length > 0 && (
+          <div
+            className={cx(styles.videoShareExtraOptions)}
+            onMouseOut={hideExtrasOnOut}
+          >
+            { /* Video share options consist of:
+               *  - Screen-share
+               *  - Webcam
+               */
+              videoShareExtraOptionTypes.map(type => (
+                <div
+                  key={type}
+                  className={cx(styles.iconButton, { [styles.disabled]: this.state.mediaDisabled })}
+                  title={this.props.videoShareMediaSource === type
                     ? "Stop sharing"
                     : `Share ${capitalize(type)}${this.state.mediaDisabled ? " Disabled" : ""}`
-                }
-                onClick={this.state.mediaDisabled ? noop : () => this.handleVideoShareClicked(type)}
-                onMouseOver={this.state.mediaDisabled ? noop : showExtrasOnHover}
-              >
-                <InlineSVG
-                  className={cx(styles.iconButtonIcon)}
-                  src={iconForType(type, this.props.videoShareMediaSource === type)}
-                />
-              </div>
+                  }
+                  onClick={this.state.mediaDisabled ? noop : () => this.handleVideoShareClicked(type)}
+                  onMouseOver={this.state.mediaDisabled ? noop : showExtrasOnHover}
+                >
+                  <InlineSVG
+                    className={cx(styles.iconButtonIcon)}
+                    src={iconForType(type, this.props.videoShareMediaSource === type)}
+                  />
+                </div>
             ))}
           </div>
         )}
@@ -244,6 +252,8 @@ class TopHUD extends Component {
 
     let tip;
 
+    // TODO: Figure out what `watching` means
+    // TODO: Figure out what `topDivForType` means
     if (this.props.watching) {
       tip = (
         <div className={cx([styles.topTip, styles.topTipNoHud])}>
@@ -271,56 +281,56 @@ class TopHUD extends Component {
     // Hide buttons when frozen.
     return (
       <div className={cx(styles.container, styles.top, styles.unselectable, uiStyles.uiInteractive)}>
-        {this.props.frozen || this.props.watching ? (
-          <div className={cx(uiStyles.uiInteractive, styles.panel)}>{tip}</div>
-        ) : (
-          <div className={cx(uiStyles.uiInteractive, styles.panel)}>
-            {tip}
-            {videoSharingButtons}
-            <div
-              className={cx(styles.iconButton)}
-              title={this.props.muted ? "Unmute Mic" : "Mute Mic"}
-              onClick={this.props.onToggleMute}
-            >
-              <InlineSVG className={cx(styles.iconButtonIcon)} src={micIcon} />
+        {this.props.frozen || this.props.watching
+          ? <div className={cx(uiStyles.uiInteractive, styles.panel)}>{tip}</div>
+          : (<div className={cx(uiStyles.uiInteractive, styles.panel)}>
+              {/*tip*/}
+              {videoSharingButtons}
+              <div
+                className={cx(styles.iconButton)}
+                title={this.props.muted ? "Unmute Mic" : "Mute Mic"}
+                onClick={this.props.onToggleMute}
+              >
+                <InlineSVG className={cx(styles.iconButtonIcon)} src={micIcon} />
+              </div>
+              <div
+                className={cx(styles.iconButton, {
+                  [styles.disabled]: this.state.mediaDisabled
+                })}
+                title={`Create${this.state.mediaDisabled ? " Disabled" : ""}`}
+                onClick={
+                  this.state.mediaDisabled ? noop : () => this.props.mediaSearchStore.sourceNavigateToDefaultSource()
+                }
+              >
+                <InlineSVG className={cx(styles.iconButtonIcon, styles.spawn)} src={SpawnIcon} />
+              </div>
+              <div
+                className={cx(styles.iconButton, {
+                  [styles.disabled]: this.state.penDisabled
+                })}
+                title={`Pen${this.state.penDisabled ? " Disabled" : ""}`}
+                onClick={this.state.penDisabled ? noop : this.props.onSpawnPen}
+              >
+                <InlineSVG
+                  className={cx(styles.iconButtonIcon)}
+                  src={this.props.isCursorHoldingPen ? PenIconActive : PenIcon}
+                />
+              </div>
+              <div
+                className={cx(styles.iconButton, {
+                  [styles.disabled]: this.state.cameraDisabled
+                })}
+                title={`Camera${this.state.cameraDisabled ? " Disabled" : ""}`}
+                onClick={this.state.cameraDisabled ? noop : this.props.onSpawnCamera}
+              >
+                <InlineSVG
+                  className={cx(styles.iconButtonIcon)}
+                  src={this.props.hasActiveCamera ? CameraIconActive : CameraIcon}
+                />
+              </div>
             </div>
-            <div
-              className={cx(styles.iconButton, {
-                [styles.disabled]: this.state.mediaDisabled
-              })}
-              title={`Create${this.state.mediaDisabled ? " Disabled" : ""}`}
-              onClick={
-                this.state.mediaDisabled ? noop : () => this.props.mediaSearchStore.sourceNavigateToDefaultSource()
-              }
-            >
-              <InlineSVG className={cx(styles.iconButtonIcon, styles.spawn)} src={SpawnIcon} />
-            </div>
-            <div
-              className={cx(styles.iconButton, {
-                [styles.disabled]: this.state.penDisabled
-              })}
-              title={`Pen${this.state.penDisabled ? " Disabled" : ""}`}
-              onClick={this.state.penDisabled ? noop : this.props.onSpawnPen}
-            >
-              <InlineSVG
-                className={cx(styles.iconButtonIcon)}
-                src={this.props.isCursorHoldingPen ? PenIconActive : PenIcon}
-              />
-            </div>
-            <div
-              className={cx(styles.iconButton, {
-                [styles.disabled]: this.state.cameraDisabled
-              })}
-              title={`Camera${this.state.cameraDisabled ? " Disabled" : ""}`}
-              onClick={this.state.cameraDisabled ? noop : this.props.onSpawnCamera}
-            >
-              <InlineSVG
-                className={cx(styles.iconButtonIcon)}
-                src={this.props.hasActiveCamera ? CameraIconActive : CameraIcon}
-              />
-            </div>
-          </div>
-        )}
+          )
+          }
       </div>
     );
   }
